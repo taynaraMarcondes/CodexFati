@@ -1,15 +1,13 @@
 import ply.yacc as yacc
 from codexFati_lex import tokens, lexer
 
-Variaveis = []
+variables = []
 
 # funções auxiliares 
-def indiceVar(name):
-    for i, v in enumerate(Variaveis):
+def varIndex(name):
+    for i, v in enumerate(variables):
         if v['name'] == name:
             return i
-    
-    print(f"Variable with name:'{name}' doesn't exist")
     return -1
 
 # funções utilizadas pelo analisador
@@ -22,29 +20,27 @@ def p_init(p):
 
 def p_main(p):
     '''program : START codelines END'''
-    print("isso é a main")
     f = open("temp.cpp", "w")
     f.write(f"#include <iostream>\n#include <string>\n\nint main(){{\n{p[2]}\n\treturn 0;\n}}")
     f.close()
 
 
 def p_codeline(p):
-    '''codeline : declaracao
-            | atribuicao
-            | saida
-            | entrada
-            | if_instr
-            | else_instr
-            | while_instr
-            | for_instr
+    '''codeline : declaration
+                | attribution
+                | output
+                | input
+                | if_statement
+                | else_statement
+                | while_statement
+                | for_statement
     '''
-    print("isso é codeline")
     p[0] = f"\t{p[1]}"
 
 
 def p_codelines(p):
     '''codelines : codeline
-            | codelines codeline'''
+                | codelines codeline'''
     if(len(p) == 2):
         p[0] = f"{p[1]}"
     else:
@@ -61,20 +57,20 @@ def p_term(p):
     p[0] = p[1]
 
 
-def p_declaracao(p):
+def p_declaration(p):
     '''
-    declaracao : T_INT ID EQUALS INT
-         | T_FLOAT ID EQUALS FLOAT
-         | T_CHAR ID EQUALS CHAR
-         | T_STRING ID EQUALS STRING
+    declaration : T_INT ID EQUALS INT
+                | T_FLOAT ID EQUALS FLOAT
+                | T_CHAR ID EQUALS CHAR
+                | T_STRING ID EQUALS STRING
      '''
 
-    if(indiceVar(p[2]) != -1):
+    if(varIndex(p[2]) != -1):
         print(f"Variable with name:'{p[2]}' already exists")
         # parar execução
         return
 
-    Variaveis.append({'name': p[2], 'type': p[1], 'value': p[4]})
+    variables.append({'name': p[2], 'type': p[1], 'value': p[4]})
 
     match(p[1]):
         case 'theKnight':
@@ -91,49 +87,49 @@ def p_declaracao(p):
                 p[0] = f'String {p[2]} = {p[4]};'
 
 
-def p_atribuicao(p):
+def p_attribution(p):
     '''
-    atribuicao : ID ATTRIBUTION ID
-            | ID ATTRIBUTION exp
-            | ID EQUALS ID
-            | ID EQUALS exp
+    attribution : ID ATTRIBUTION ID
+                | ID ATTRIBUTION exp
+                | ID EQUALS ID
+                | ID EQUALS exp
     '''
     
-    index = indiceVar(p[1])
+    index = varIndex(p[1])
     if(index == -1):
         # parar execução
         return
 
     match(p[2]):
         case '+=':
-            Variaveis[index]["value"] += p[3]
+            variables[index]["value"] += p[3]
             p[0] = f'{p[1]} += {p[3]};'
         case '-=':
-            Variaveis[index]["value"] -= p[3]
+            variables[index]["value"] -= p[3]
             p[0] = f'{p[1]} -= {p[3]};'
         case '*=':
-            Variaveis[index]["value"] *= p[3]
+            variables[index]["value"] *= p[3]
             p[0] = f'{p[1]} *= {p[3]};'
         case '/=':
-            Variaveis[index]["value"] /= p[3]
+            variables[index]["value"] /= p[3]
             p[0] = f'{p[1]} /= {p[3]};'
         case '%=':
-            Variaveis[index]["value"] %= p[3]
+            variables[index]["value"] %= p[3]
             p[0] = f'{p[1]} %= {p[3]};'
         case 'justice':
-            Variaveis[index]["value"] = p[3]
+            variables[index]["value"] = p[3]
             p[0] = f'{p[1]} = {p[3]};'
 
 
-def p_generic_expression(p):
+def p_expression(p):
     '''exp : term
-                | OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
-                | exp RELOP exp
-                | exp ARITOP exp
-                | exp AND exp
-                | exp OR exp
-                | NOT exp
-                ''' 
+            | OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
+            | exp RELOP exp
+            | exp ARITOP exp
+            | exp AND exp
+            | exp OR exp
+            | NOT exp
+    ''' 
     if(len(p)==2):
         p[0] = p[1]
     elif(len(p) == 3):
@@ -170,7 +166,7 @@ def p_generic_expression(p):
 
 
 def p_if(p):
-    'if_instr : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    'if_statement : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
 
     p[0] = f'''
         if({p[3]}) {{
@@ -180,7 +176,7 @@ def p_if(p):
 
 
 def p_else(p):
-    'else_instr : if_instr ELSE OPEN_BRACES codeline CLOSE_BRACES'
+    'else_statement : if_statement ELSE OPEN_BRACES codeline CLOSE_BRACES'
     
     p[0] = f'''
         {p[1]} 
@@ -191,16 +187,17 @@ def p_else(p):
 
 
 def p_while(p):
-  'while_instr : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
-
-  p[0] = f'''
-    while({p[3]}){{
-        {p[6]}
-    }}
-  '''
+    'while_statement : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    
+    p[0] = f'''
+        while({p[3]}){{
+            {p[6]}
+        }}
+    '''
 
 def p_for(p):
-    'for_instr : FOR OPEN_PARENTHESIS exp SEMICOLON exp SEMICOLON exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    'for_statement : FOR OPEN_PARENTHESIS exp SEMICOLON exp SEMICOLON exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    
     print('aqui',p[3])
     p[0] = f'''
         for({p[3]}; {p[5]}; {p[7]}){{
@@ -209,16 +206,14 @@ def p_for(p):
     '''
 
 def p_print(p):
-    '''
-        saida : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
-    '''
+    'output : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS'
+    
     p[0] = f'std::cout << {p[3]};'
 
 
 def p_read(p):
-    '''
-    entrada : INPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
-    '''
+    'input : INPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS'
+    
     p[0] = f'std::cin << {p[3]};'
 
 
@@ -232,8 +227,8 @@ start
     theKnight y justice 5
     theKnight x justice 10
 
-    hermit(theKnight x justice 0; x < y; x += 1){
-        sun(x)
+    emperor(x > y){
+        y += 1
     }
 
 end
@@ -256,4 +251,4 @@ while True:
 result = parser.parse(code)
 print(result)
 
-print(f"Variaveis: {Variaveis}")
+print(f"variables: {variables}")

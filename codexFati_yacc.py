@@ -41,25 +41,25 @@ def p_term(p):
 
 Variaveis = []
 
-def existeVar(name):
-    index = 0
-    for v in Variaveis:
+def indiceVar(name):
+    for i, v in enumerate(Variaveis):
         if v['name'] == name:
-            return index
-        index += 1
+            return i
+    
+    print(f"Variable with name:'{name}' doesn't exist")
     return -1
 
-def value(var):
-    id = existeVar(var)
-    if(id == -1):
-        print("Variable "+var+" doesn't exist")
-    else:
-        return var
-        # if(Variaveis[id]['type'] == 'value'):
-        #     return var
-        # else:
-        #     letras = modeloResitor2vetor(Variaveis[id]['value'])
-        #     return conversao1(letras)
+# def value(var):
+#     id = existeVar(var)
+#     if(id == -1):
+#         print("Variable "+var+" doesn't exist")
+#     else:
+#         return var
+#         # if(Variaveis[id]['type'] == 'value'):
+#         #     return var
+#         # else:
+#         #     letras = modeloResitor2vetor(Variaveis[id]['value'])
+#         #     return conversao1(letras)
 
 def p_main(p):
     '''program : START codelines END'''
@@ -78,7 +78,6 @@ def p_declaracao(p):
      '''
 
     Variaveis.append({'name': p[2], 'type': p[1], 'value': p[4]})
-    print(Variaveis)
 
     match(p[1]):
         case 'theKnight':
@@ -88,12 +87,45 @@ def p_declaracao(p):
             if type(p[4]) == float:
                 p[0] = f'float {p[2]} = {p[4]};'
         case 'death':
-            if type(p[4]) == str and len(p[4]) == 1:
+            if type(p[4]) == str and len(p[4]) == 3:
                 p[0] = f'char {p[2]} = {p[4]};'
         case 'theHighPriestess':
             if type(p[4]) == str:
                 p[0] = f'String {p[2]} = {p[4]};'
+
+def p_atribuicao(p):
+    '''
+    atribuicao : ID ATTRIBUTION ID
+            | ID ATTRIBUTION exp
+            | ID EQUALS ID
+            | ID EQUALS exp
+    '''
     
+    index = indiceVar(p[1])
+    if(index == -1):
+        # parar execução
+        return
+
+    match(p[2]):
+        case '+=':
+            Variaveis[index]["value"] += p[3]
+            p[0] = f'{p[1]} += {p[3]};'
+        case '-=':
+            Variaveis[index]["value"] -= p[3]
+            p[0] = f'{p[1]} -= {p[3]};'
+        case '*=':
+            Variaveis[index]["value"] *= p[3]
+            p[0] = f'{p[1]} *= {p[3]};'
+        case '/=':
+            Variaveis[index]["value"] /= p[3]
+            p[0] = f'{p[1]} /= {p[3]};'
+        case '%=':
+            Variaveis[index]["value"] %= p[3]
+            p[0] = f'{p[1]} %= {p[3]};'
+        case 'justice':
+            Variaveis[index]["value"] = p[3]
+            p[0] = f'{p[1]} = {p[3]};'
+
 
 # ----------------------------------------------------
 
@@ -146,36 +178,11 @@ def p_generic_expression(p):
 
 
 
-
-def p_atribuicao(p):
-    '''
-    atribuicao : ID ATTRIBUTION ID
-        | ID ATTRIBUTION exp
-        | ID EQUALS ID
-        | ID EQUALS exp
-    '''
-    
-
-    match(p[1]):
-        case '+=':
-            p[0] = f'{p[1]} = {p[1]} + {p[3]}'
-        case '-=':
-            p[0] = f'{p[1]} = {p[1]} - {p[3]}'
-        case '*=':
-            p[0] = f'{p[1]} = {p[1]} * {p[3]}'
-        case '/=':
-            p[0] = f'{p[1]} = {p[1]} / {p[3]}'
-        case '%=':
-            p[0] = f'{p[1]} = {p[1]} % {p[3]}'
-        case 'justice':
-            teste[p[1]] = p[3]
-
-
 def p_print(p):
     '''
-    saida : OUTPUT OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
+    saida : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
     '''
-    p[0] += f'std::cout << {v}\n'
+    p[0] = f'std::cout << {p[3]};\n'
 
 
 # # Error rule for syntax errors
@@ -186,9 +193,7 @@ def p_print(p):
 code = ''' 
 start
     theKnight y justice 5
-    temperance x justice 2.5
-    death w justice 'a'
-    theHighPriestess z justice "abc"
+    x justice 10
 end
 '''
 

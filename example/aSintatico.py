@@ -1,4 +1,4 @@
-from alexico import tokens, analizador
+from aLexico import tokens, analizador
 from sys import stdin
 import ply.yacc as yacc
 
@@ -29,7 +29,7 @@ def p_instrucciones_instruccion(t):
   t[0]=[t[1]]
 
 def p_instruccion(t):
-  '''instruccion: imprimir_instr
+  '''instruccion : imprimir_instr
                   | asignacion_instr
                   | if_instr
                   | while_instr
@@ -37,13 +37,13 @@ def p_instruccion(t):
   t[0] = t[1]
 
 def p_if(t):
-  'if_instr: IF PARIZQ expresion_logica PARDER LLAVIZQ statement LLAVDER'
+  'if_instr : IF PARIZQ expresion_logica PARDER LLAVIZQ statement LLAVDER'
   print(t[3])
   if(t[3]):
     t[0]=t[6]
 
 def p_statement (t):
-  '''statement: imprimir_instr
+  '''statement : imprimir_instr
                 | if_instr
                 | expresion
                 | while_instr
@@ -62,7 +62,7 @@ def p_asignacion(t):
   nombres[t[1]] = t[3]
 
 def p_asignacion_tipo(t):
-  '''expresion: ENTERO
+  '''expresion : ENTERO
                 | DECIMAL
                 | CADENA
   '''
@@ -101,11 +101,11 @@ def p_expresion_logica_group(t):
   t[0]=t[2]
 
 def p_expresion_logica_group(t):
-  '''expresion logica : PARIZQ expresion_logica PARDER MENQUE PARIZQ expresion_logica PARDER
+  '''expresion_logica : PARIZQ expresion_logica PARDER MENQUE PARIZQ expresion_logica PARDER
                       | PARIZQ expresion_logica PARDER MAYQUE PARIZQ expresion_logica PARDER
                       | PARIZQ expresion_logica PARDER IGUALQUE PARIZQ expresion_logica PARDER
                       | PARIZQ expresion_logica PARDER NIGUALQUE PARIZQ expresion_logica PARDER
-                      | PARIZQ expresion logica PARDER MAYIGUAL PARIZQ expresion_logica PARDER
+                      | PARIZQ expresion_logica PARDER MAYIGUAL PARIZQ expresion_logica PARDER
                       | PARIZQ expresion_logica PARDER MENIGUAL PARIZQ expresion_logica PARDER
   '''
   if t[4] == '<': t[0] = t[2] < t[5]
@@ -116,9 +116,9 @@ def p_expresion_logica_group(t):
   elif t[2] == '>=': t[0] = t[2] >= t[5]
 
 def p_expresion_operador_logico (t):
-  '''expresion logica: PARIZQ expresion_logica PARDER AND PARIZQ expresion_logica PARDER
-                    | PARIZQ expresion_logica PARDER ORD PARIZQ expresion_logica PARDER
-                    | PARIZQ expresion logica PARDER NOT PARIZQ expresion_logica PARDER
+  '''expresion_logica : PARIZQ expresion_logica PARDER AND PARIZQ expresion_logica PARDER
+                    | PARIZQ expresion_logica PARDER OR PARIZQ expresion_logica PARDER
+                    | PARIZQ expresion_logica PARDER NOT PARIZQ expresion_logica PARDER
   '''
   if t[4] == 'ka': t[0] = t[2] and t[5]
   elif t[4] == 'kam': t[0] = [2] or t[5]
@@ -148,11 +148,20 @@ def p_error(t):
 parser = yacc.yacc()
 resultado_gramatica = []
 
-def prueba (data):
+def prueba ():
+  data = '''
+    x = 2;
+    pekenum(x);
+  '''
   resultado_gramatica.clear()
   for item in data.splitlines():
+    print(item)
+    gram = None
     if item:
       gram = parser.parse(item)
     if gram:
       resultado_gramatica.append(str(gram))
   return resultado_gramatica
+
+res = prueba()
+print(res)

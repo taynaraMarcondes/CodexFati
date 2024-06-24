@@ -6,7 +6,7 @@ reservadas = {
   'pekenum':'PRINT',
   'ka':'AND',
   'kil':'NOT',
-  'kam':'ORD',
+  'kam':'OR',
 }
 
 tokens = [
@@ -17,7 +17,7 @@ tokens = [
 'DOBPUNTO',
 'PARDER',
 'IGUAL',
-'IGUALQUE'
+'IGUALQUE',
 'NIGUALQUE',
 'MAS',
 'MENOS',
@@ -108,6 +108,6 @@ def t_error(t):
   print ("Caracter Invalido '%s'"&t.value[0] )
   t.lexer.skip (1)
   return t
-  
+
 # instanciamos el analizador lexico
 analizador = lex.lex()

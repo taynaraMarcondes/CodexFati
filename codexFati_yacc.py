@@ -2,80 +2,124 @@ import ply.yacc as yacc
 from codexFati_lex import tokens
 
 teste = {}
+precedence =(
+  ('right', 'EQUALS'),
+#   ('right', 'IGUALQUE'),
+#   ('left', 'MAYQUE', 'MENQUE'), #' menor', 'menorigual'),
+#   ('left', 'MAS', 'MENOS'),
+#   ('left', 'POR', 'DIVIDIDO'),
+  ('left', 'OPEN_PARENTHESIS', 'CLOSE_PARENTHESIS'),
+  ('left', 'OPEN_BRACES', 'CLOSE_BRACES')
+  )
 
-def p_odio(p):
-    '''odio : exp_arit
-            | exp_logica
-            | atribuicao
-            | saida
-    '''
+def p_init(p):
+    'init : intrucoes'
     p[0] = p[1]
+
+def p_intrucoes_lista(p):
+    '''
+        intrucoes : intrucoes instrucao
+                | instrucao
+    '''
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[1].append(p[2])
+        p[0] = p[1]
+
+# def p_instrucoes_instrucao(p):
+#     'instrucoes : instrucao'
+#     p[0] = [p[1]]
+
+def p_instrucao(p):
+    '''
+        instrucao : saida
+                | atribuicao
+    '''
+
+# def p_odio(p):
+#     '''odio : saida
+#             | exp_arit
+#             | exp_logica
+#             | atribuicao
+#     '''
+#     p[0] = p[1]
 
 def p_termo(p):
     '''termo : INT
             | FLOAT
-            | ID
+            | CHAR
+            | STRING
     '''
     p[0] = p[1]
 
+def p_termo_id(p):
+    'termo : ID'
 
-# Definindo expressões aritméticas --------------------------
-def p_exp_arit(p):
-    '''exp_arit : termo
-                | exp_arit ARITOP exp_arit
-                | OPEN_PARENTHESIS exp_arit CLOSE_PARENTHESIS
-    '''
-    if(len(p) == 2):
-        p[0] = p[1]
-    elif(len(p) == 4):
-        if p[2] == '+':
-            p[0] = p[1] + p[3]
-        elif p[2] == '-':
-            p[0] = p[1] - p[3]
-        elif p[2] == '*':
-            p[0] = p[1] * p[3]
-        elif p[2] == '/':
-            p[0] = p[1] / p[3]
-        elif p[2] == '%':
-            p[0] = p[1] % p[3]
-        elif p[1] == '(':
-            p[0] = ( p[2] )
-#------------------------------------------------------------
+    p[0] = teste[p[1]]
 
-#Definindo expressões lógicas -------------------------------
+def p_termo_grupo(p):
+    'termo : OPEN_PARENTHESIS termo CLOSE_PARENTHESIS'
 
-def p_exp_logica(p):
-    '''exp_logica : termo
-                | CHAR 
-                | STRING 
-                | OPEN_PARENTHESIS exp_logica CLOSE_PARENTHESIS
-                | exp_logica RELOP exp_logica
-                | exp_logica AND exp_logica
-                | exp_logica OR exp_logica 
-                | NOT exp_logica''' 
-    if(len(p)==2):
-        p[0] = p[1]
-    elif(len(p) == 3):
-        p[0] = not p[2]
-    elif(len(p) == 4):
-        if p[2] == '==':
-            p[0] = p[1] == p[3]
-        elif p[2] == '>=':
-            p[0] = p[1] >= p[3]
-        elif p[2] == '<=':
-            p[0] = p[1] <= p[3]
-        elif p[2] == '>':
-            p[0] = p[1] > p[3]
-        elif p[2] == '<':
-            p[0] = p[1] < p[3]
-        elif p[2] == '!=':
-            p[0] = p[1] != p[3]
-        elif p[2] == 'AND':
-            p[0] = p[1] and p[3]
-        elif p[2] == 'OR':
-            p[0] = p[1] or p[3]
-        elif p[1] == '(':
-            p[0] = ( p[2] )
+    p[0] = p[2]
+
+# # Definindo expressões aritméticas --------------------------
+# def p_exp_arit(p):
+#     '''exp_arit : termo
+#                 | exp_arit ARITOP exp_arit
+#                 | OPEN_PARENTHESIS exp_arit CLOSE_PARENTHESIS
+#     '''
+#     if(len(p) == 2):
+#         p[0] = p[1]
+#     elif(len(p) == 4):
+#         if p[2] == '+':
+#             p[0] = p[1] + p[3]
+#         elif p[2] == '-':
+#             p[0] = p[1] - p[3]
+#         elif p[2] == '*':
+#             p[0] = p[1] * p[3]
+#         elif p[2] == '/':
+#             p[0] = p[1] / p[3]
+#         elif p[2] == '%':
+#             p[0] = p[1] % p[3]
+#         elif p[1] == '(':
+#             p[0] = ( p[2] )
+# #------------------------------------------------------------
+
+# #Definindo expressões lógicas -------------------------------
+
+# def p_exp_logica(p):
+#     '''
+#         exp_logica : termo
+#                 | OPEN_PARENTHESIS exp_logica CLOSE_PARENTHESIS
+#                 | exp_logica RELOP exp_logica
+#                 | exp_logica AND exp_logica
+#                 | exp_logica OR exp_logica 
+#                 | NOT exp_logica
+#     ''' 
+#     if(len(p)==2):
+#         p[0] = p[1]
+#     elif(len(p) == 3):
+#         p[0] = not p[2]
+#     elif(len(p) == 4):
+#         if p[2] == '==':
+#             p[0] = p[1] == p[3]
+#         elif p[2] == '>=':
+#             p[0] = p[1] >= p[3]
+#         elif p[2] == '<=':
+#             p[0] = p[1] <= p[3]
+#         elif p[2] == '>':
+#             p[0] = p[1] > p[3]
+#         elif p[2] == '<':
+#             p[0] = p[1] < p[3]
+#         elif p[2] == '!=':
+#             p[0] = p[1] != p[3]
+#         elif p[2] == 'theLovers':
+#             p[0] = p[1] and p[3]
+#         elif p[2] == 'theDevil':
+#             p[0] = p[1] or p[3]
+#         elif p[1] == '(':
+#             p[0] = ( p[2] )
 #------------------------------------------------------------
 
 
@@ -103,35 +147,29 @@ def p_exp_logica(p):
 
 def p_atribuicao(p):
     '''
-    atribuicao : ID ATTRIBUTION ID
-        | ID ATTRIBUTION exp_arit
-        | ID ATTRIBUTION exp_logica
-        | ID EQUALS ID
-        | ID EQUALS exp_arit
-        | ID EQUALS exp_logica
+    atribuicao : ID ATTRIBUTION termo
+            | ID EQUALS termo
     '''
 
-    match(p[1]):
+    match(p[2]):
         case '+=':
-            p[0] = f'{p[1]} = {p[1]} + {p[3]}'
+            teste[p[1]] = teste[p[1]] + p[3]
         case '-=':
-            p[0] = f'{p[1]} = {p[1]} - {p[3]}'
+            teste[p[1]] = teste[p[1]] - p[3]
         case '*=':
-            p[0] = f'{p[1]} = {p[1]} * {p[3]}'
+            teste[p[1]] = teste[p[1]] * p[3]
         case '/=':
-            p[0] = f'{p[1]} = {p[1]} / {p[3]}'
+            teste[p[1]] = teste[p[1]] / p[3]
         case '%=':
-            p[0] = f'{p[1]} = {p[1]} % {p[3]}'
+            teste[p[1]] = teste[p[1]] % p[3]
         case 'justice':
             teste[p[1]] = p[3]
+    
 
 
 def p_print(p):
-    '''
-    saida : OUTPUT OPEN_PARENTHESIS exp_logica CLOSE_PARENTHESIS 
-        | OUTPUT OPEN_PARENTHESIS exp_arit CLOSE_PARENTHESIS 
-    '''
-    p[0] = p[3]
+    'saida : OUTPUT OPEN_PARENTHESIS termo CLOSE_PARENTHESIS '
+    p[0] = print(p[3])
 
 
 # # Error rule for syntax errors
@@ -145,6 +183,7 @@ parser = yacc.yacc()
 result = parser.parse(
     ''' 
     x justice 2
+    x += 2
     sun(x)
     '''
 )

@@ -100,6 +100,7 @@ lexer = lex.lex()
 #Código para teste
 data1 = '''
 x justice 2
+sun(x)
 '''
 
 #Dar input para o lexer

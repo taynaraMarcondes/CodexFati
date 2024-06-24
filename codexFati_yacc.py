@@ -179,9 +179,6 @@ def p_while(p):
 
 def p_for(p):
     'for_statement : FOR OPEN_PARENTHESIS attribution SEMICOLON exp SEMICOLON attribution CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
-    print(p[3])
-    print(p[5])
-    print(p[7])
     p[0] = f"for({p[3].replace(";", "")}; {p[5]}; {p[7].replace(";", "")}){{\n{p[10]}\n\t}}"
 
 def p_print(p):

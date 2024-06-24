@@ -14,6 +14,7 @@ def p_odio(p):
 def p_codeline(p):
     '''codeline : declaracao
             | atribuicao
+            | saida
             | if_instr
             | else_instr
     '''
@@ -208,7 +209,7 @@ def p_print(p):
     '''
     saida : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
     '''
-    p[0] = f'std::cout << {p[3]};\n'
+    p[0] = f'std::cout << {p[3]};'
 
 
 # # Error rule for syntax errors
@@ -219,10 +220,9 @@ def p_print(p):
 code = ''' 
 start
     theKnight y justice 5
-    x justice 10
+    sun(y)
 end
 '''
-
 
 # Build the parser
 parser = yacc.yacc()

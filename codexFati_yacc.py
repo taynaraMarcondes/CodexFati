@@ -14,6 +14,8 @@ def p_odio(p):
 def p_codeline(p):
     '''codeline : declaracao
             | atribuicao
+            | if_instr
+            | else_instr
     '''
     print("isso é codeline")
     p[0] = f"\t{p[1]}"
@@ -176,7 +178,31 @@ def p_generic_expression(p):
             p[0] = ( p[2] )
 #------------------------------------------------------------
 
+def p_if(p):
+    'if_instr : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
 
+    p[0] = f'''
+        if({p[3]}) {{
+            {p[6]}
+        }}
+    '''
+
+def p_else(p):
+    'else_instr : if_instrucao ELSE OPEN_BRACES codeline CLOSE_BRACES'
+    
+    p[0] = f'''
+        {p[1]} 
+        else {{
+            {p[4]}
+        }}
+    '''
+
+# def p_while(p):
+#   'while_instr : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+  
+#   p[0] = 
+#   while(t[3]):
+#     t[0]=t[6]
 
 def p_print(p):
     '''

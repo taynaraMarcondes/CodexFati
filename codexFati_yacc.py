@@ -1,58 +1,112 @@
 import ply.yacc as yacc
-from codexFati_lex import tokens
+from codexFati_lex import tokens, lexer
 
 teste = {}
 
 def p_odio(p):
-    '''odio : exp_arit
-            | exp_logica
-            | atribuicao
+    '''odio : exp
             | saida
+            | codelines
+            | program
     '''
     p[0] = p[1]
 
-def p_termo(p):
-    '''termo : INT
+def p_codeline(p):
+    '''codeline : declaracao
+            | atribuicao
+    '''
+    print("isso é codeline")
+    p[0] = f"\t{p[1]}"
+
+def p_codelines(p):
+    '''codelines : codeline
+            | codelines codeline'''
+    if(len(p) == 2):
+        p[0] = f"{p[1]}"
+    else:
+        p[0] = f"{p[1]}\n{p[2]}"
+
+
+def p_term(p):
+    '''term : INT
             | FLOAT
             | ID
+            | STRING
+            | CHAR
     '''
     p[0] = p[1]
 
 
-# Definindo expressões aritméticas --------------------------
-def p_exp_arit(p):
-    '''exp_arit : termo
-                | exp_arit ARITOP exp_arit
-                | OPEN_PARENTHESIS exp_arit CLOSE_PARENTHESIS
+# Codigo kibado --------------------------
+
+Variaveis = []
+
+def existeVar(name):
+    index = 0
+    for v in Variaveis:
+        if v['name'] == name:
+            return index
+        index += 1
+    return -1
+
+def value(var):
+    id = existeVar(var)
+    if(id == -1):
+        print("Variable "+var+" doesn't exist")
+    else:
+        return var
+        # if(Variaveis[id]['type'] == 'value'):
+        #     return var
+        # else:
+        #     letras = modeloResitor2vetor(Variaveis[id]['value'])
+        #     return conversao1(letras)
+
+def p_main(p):
+    '''program : START codelines END'''
+    print("isso é a main")
+    f = open("temp.cpp", "w")
+    f.write(f"#include <iostream>\n#include <string>\n\nint main(){{\n{p[2]}\n\treturn 0;\n}}")
+    f.close()
+
+
+def p_declaracao(p):
     '''
-    if(len(p) == 2):
-        p[0] = p[1]
-    elif(len(p) == 4):
-        if p[2] == '+':
-            p[0] = p[1] + p[3]
-        elif p[2] == '-':
-            p[0] = p[1] - p[3]
-        elif p[2] == '*':
-            p[0] = p[1] * p[3]
-        elif p[2] == '/':
-            p[0] = p[1] / p[3]
-        elif p[2] == '%':
-            p[0] = p[1] % p[3]
-        elif p[1] == '(':
-            p[0] = ( p[2] )
-#------------------------------------------------------------
+    declaracao : T_INT ID EQUALS INT
+         | T_FLOAT ID EQUALS FLOAT
+         | T_CHAR ID EQUALS CHAR
+         | T_STRING ID EQUALS STRING
+     '''
 
-#Definindo expressões lógicas -------------------------------
+    Variaveis.append({'name': p[2], 'type': p[1], 'value': p[4]})
+    print(Variaveis)
 
-def p_exp_logica(p):
-    '''exp_logica : termo
-                | CHAR 
-                | STRING 
-                | OPEN_PARENTHESIS exp_logica CLOSE_PARENTHESIS
-                | exp_logica RELOP exp_logica
-                | exp_logica AND exp_logica
-                | exp_logica OR exp_logica 
-                | NOT exp_logica''' 
+    match(p[1]):
+        case 'theKnight':
+            if type(p[4]) == int:
+                p[0] = f'int {p[2]} = {p[4]};'
+        case 'temperance':
+            if type(p[4]) == float:
+                p[0] = f'float {p[2]} = {p[4]};'
+        case 'death':
+            if type(p[4]) == str and len(p[4]) == 1:
+                p[0] = f'char {p[2]} = {p[4]};'
+        case 'theHighPriestess':
+            if type(p[4]) == str:
+                p[0] = f'String {p[2]} = {p[4]};'
+    
+
+# ----------------------------------------------------
+
+#Definindo expressões genéricas ----------------------
+def p_generic_expression(p):
+    '''exp : term
+                | OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
+                | exp RELOP exp
+                | exp ARITOP exp
+                | exp AND exp
+                | exp OR exp
+                | NOT exp
+                ''' 
     if(len(p)==2):
         p[0] = p[1]
     elif(len(p) == 3):
@@ -76,40 +130,31 @@ def p_exp_logica(p):
             p[0] = p[1] or p[3]
         elif p[1] == '(':
             p[0] = ( p[2] )
+        elif p[2] == '+':
+            p[0] = p[1] + p[3]
+        elif p[2] == '-':
+            p[0] = p[1] - p[3]
+        elif p[2] == '*':
+            p[0] = p[1] * p[3]
+        elif p[2] == '/':
+            p[0] = p[1] / p[3]
+        elif p[2] == '%':
+            p[0] = p[1] % p[3]
+        elif p[1] == '(':
+            p[0] = ( p[2] )
 #------------------------------------------------------------
 
 
-# def p_declaracao(p):
-#     '''
-#     declaracao : T_INT ID EQUALS INT
-#         | T_FLOAT ID EQUALS FLOAT
-#         | T_CHAR ID EQUALS CHAR
-#         | T_STRING ID EQUALS STRING
-#     '''
 
-#     match(p[1]):
-#         case 'theKnight':
-#             if type(p[4]) == int:
-#                 p[0] = f'{p[2]} = {p[4]}'
-#         case 'temperance':
-#             if type(p[4]) == float:
-#                 p[0] = f'{p[2]} = {p[4]}'
-#         case 'death':
-#             if type(p[4]) == str and len(p[4]) == 1:
-#                 p[0] = f'{p[2]} = {p[4]}'
-#         case 'theHighPriestess':
-#             if type(p[4]) == str:
-#                 p[0] = f'{p[2]} = {p[4]}'
 
 def p_atribuicao(p):
     '''
     atribuicao : ID ATTRIBUTION ID
-        | ID ATTRIBUTION exp_arit
-        | ID ATTRIBUTION exp_logica
+        | ID ATTRIBUTION exp
         | ID EQUALS ID
-        | ID EQUALS exp_arit
-        | ID EQUALS exp_logica
+        | ID EQUALS exp
     '''
+    
 
     match(p[1]):
         case '+=':
@@ -128,24 +173,227 @@ def p_atribuicao(p):
 
 def p_print(p):
     '''
-    saida : OUTPUT OPEN_PARENTHESIS exp_logica CLOSE_PARENTHESIS 
-        | OUTPUT OPEN_PARENTHESIS exp_arit CLOSE_PARENTHESIS 
+    saida : OUTPUT OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
     '''
-    p[0] = p[3]
+    p[0] += f'std::cout << {v}\n'
 
 
 # # Error rule for syntax errors
 # def p_error(p):
 #     print("Syntax error in input!")
 
-# Build the parser
 
+code = ''' 
+start
+    theKnight y justice 5
+    temperance x justice 2.5
+    death w justice 'a'
+    theHighPriestess z justice "abc"
+end
+'''
+
+
+# Build the parser
 parser = yacc.yacc()
 
-result = parser.parse(
-    ''' 
-    x justice 2
-    sun(x)
-    '''
-)
+#Dar input para o lexer
+lexer.input(code)
+
+#Tokenizar
+while True:
+    tok = lexer.token()
+    if not tok: #Se não tiver mais input
+        break  
+    print(tok)
+
+result = parser.parse(code)
 print(result)
+
+print(f"Variaveis: {Variaveis}")
+
+########################################################################################
+
+
+# def p_var(p):
+#     '''
+#         variaveis : VARIAVEL
+#     '''
+#     p[0] = p[1]
+
+# def p_Variaveis(p):
+#     '''
+#         variaveis : variaveis VIRGULA VARIAVEL
+#     '''
+#     p[0] = F'{p[1]}{p[2]}{p[3]}'
+
+# def p_definicaovalue(p):
+#     '''
+#         definicaovalue : VARIAVEL ATRIBUICAO value TERMINADOR_LINHA
+#     '''
+#     if existeVar(p[1]) == -1:
+#         print("Variavel não declarada!")
+#     Variaveis[existeVar(p[1])]['value'] = p[3]
+#     p[0] = f'{p[1]} = {p[3]}{p[4]}'
+
+# def p_definicaoResistor(p):
+#     '''
+#         definicaoResistor : VARIAVEL ATRIBUICAO modeloResistor TERMINADOR_LINHA
+#     '''
+#     if existeVar(p[1]) == -1:
+#         print("Variavel não declarada!")
+#     Variaveis[existeVar(p[1])]['value'] = p[3]
+#     p[0] = f'strcpy({p[1]},"{p[3]}"){p[4]}'
+
+# def p_modeloResisor3(p):
+#     '''
+#         modeloResistor : ABRE_COLCHETES cor VIRGULA cor VIRGULA cor FECHA_COLCHETES
+
+#     '''
+#     p[0] = f'{p[1]}{p[2]}{p[3]}{p[4]}{p[5]}{p[6]}{p[7]}'
+
+# def p_modeloResisor4(p):
+#     '''
+#         modeloResistor : ABRE_COLCHETES cor VIRGULA cor VIRGULA cor VIRGULA cor FECHA_COLCHETES
+
+#     '''
+#     p[0] = f'{p[1]}{p[2]}{p[3]}{p[4]}{p[5]}{p[6]}{p[7]}{p[8]}{p[9]}'
+
+# def p_Cor(p):
+#     '''
+#         cor : PRETO
+#             | MARROM
+#             | VERMELHO
+#             | LARANJA
+#             | AMARELO
+#             | VERDE
+#             | AZUL
+#             | VIOLETA
+#             | CINZA
+#             | BRANCO
+#             | DOURADO
+#             | PRATEADO
+#     '''
+#     p[0] = p[1]
+    
+# def p_operacaoParalelo(p):
+#     '''
+#         operacaoParalelo : VARIAVEL ATRIBUICAO resParalelo TERMINADOR_LINHA
+#     '''
+#     id = existeVar(p[1])
+#     if  id == -1:
+#         print("Variavel não declarada!")
+#     if Variaveis[id]['type'] != "value":
+#         print("Tipo incorreto para conversao")
+#     p[0] = f'{p[1]} = {p[3]}{p[4]}\n    ' 
+
+# def p_resParalelo(p):
+#     '''
+#         resParalelo : VARIAVEL PARALELO VARIAVEL
+#     '''
+#     p[0] = f'(1.0/((1.0/{value(p[1])})+1.0/({value(p[3])})))'
+
+# def p_resParalelo2(p):
+#     '''
+#         resParalelo : resParalelo PARALELO VARIAVEL
+#     '''
+#     p[0] = f'(1.0/((1.0/{p[1]})+1.0/({value(p[3])})))'
+
+# def p_operacaoSerie(p):
+#     '''
+#         operacaoSerie : VARIAVEL ATRIBUICAO resSerie TERMINADOR_LINHA
+#     '''
+#     id = existeVar(p[1])
+#     if  id == -1:
+#         print("Variavel não declarada!")
+#     if Variaveis[id]['type'] != "value":
+#         print("Tipo incorreto para conversao")
+#     p[0] = f'{p[1]} = {p[3]}{p[4]}\n    '
+
+# def p_resSerie(p):
+#     '''
+#         resSerie : VARIAVEL SERIE VARIAVEL
+#     '''
+#     p[0] = f'{value(p[1])} + {value(p[3])}'
+
+# def p_resSerie2(p):
+#     '''
+#         resSerie : resSerie SERIE VARIAVEL
+#     '''
+#     p[0] = f'{p[1]} + {value(p[3])}'
+
+# def p_conversao1(p):
+#     '''
+#         conversao1 : VARIAVEL ATRIBUICAO CONVERSAO_value modeloResistor TERMINADOR_LINHA
+#     '''
+#     id = existeVar(p[1])
+#     if  id == -1:
+#         print("Variavel não declarada!")
+#     if Variaveis[id]['type'] != "value":
+#         print("Tipo incorreto para conversao")
+#     valueRes = conversao1(modeloResitor2vetor(p[4]))
+#     Variaveis[id]['value'] = valueRes
+#     Variaveis[id]['type'] = 'value'
+#     p[0] = f'{p[1]} = {valueRes}{p[5]}'
+
+# def p_conversao2(p):
+#     '''
+#         conversao2 : VARIAVEL ATRIBUICAO CONVERSAO_RESISTOR value TERMINADOR_LINHA
+#     '''
+#     id = existeVar(p[1])
+#     if  id == -1:
+#         print("Variavel não declarada!")
+#     if Variaveis[id]['type'] != "resistor":
+#         print("Tipo incorreto para conversao")
+#     valueRes = conversao2(float(p[4]))
+#     Variaveis[id]['value'] = valueRes
+#     Variaveis[id]['type'] = 'resistor'
+#     p[0] = f'strcpy({p[1]},"{valueRes}"){p[5]}'
+
+# def p_conversaoGenerica(p):
+#     '''
+#         conversaoGenerica : VARIAVEL ATRIBUICAO conversao VARIAVEL TERMINADOR_LINHA
+#     '''
+#     id = existeVar(p[1])
+#     if  id == -1:
+#         print("Variavel não declarada!")
+#     tipo = 'value' if (p[3] == "re2va") else 'resistor'
+#     if Variaveis[id]['type'] != tipo:
+#         print("Tipo incorreto para conversao")
+#     id = existeVar(p[4])
+#     if(tipo == 'value'):
+#         valueRes = conversao1(modeloResitor2vetor(Variaveis[id]['value']))
+#         Variaveis[existeVar(p[1])]['value'] = valueRes
+#         p[0] = f'{p[1]} = {valueRes}{p[5]}'
+#     else:
+#         valueRes = conversao2(float(Variaveis[id]['value']))
+#         Variaveis[existeVar(p[1])]['value'] = valueRes
+#         p[0] = f'strcpy({p[1]},"{valueRes}"){p[5]}'
+
+# def p_conversao(p):
+#     '''
+#         conversao : CONVERSAO_RESISTOR 
+#                    | CONVERSAO_value
+#     '''
+#     p[0] = p[1]
+
+# def p_mostrar(p):
+#     '''
+#         mostrar : MOSTRAR ABRE_COLCHETES variaveis FECHA_COLCHETES TERMINADOR_LINHA
+#     '''
+#     Variaveis = p[3].split(',')
+#     p[0] = ''
+#     for v in Variaveis:
+#         id = existeVar(v)
+#         if(id == -1):
+#             print("Variavel"+{v}+"nao existente")
+#         else:
+#             if(Variaveis[id]['type'] == 'value'):
+#                 p[0] += f'printf("{v} = %.2f\\n",{v}){p[5]}\n   '
+#             else:
+#                 p[0] += f'printf("{v} = %s\\n",{v}){p[5]}\n   '
+
+# parser = yacc.yacc()
+
+# from exemploCodigos import interpretar
+
+# result = parser.parse(interpretar)

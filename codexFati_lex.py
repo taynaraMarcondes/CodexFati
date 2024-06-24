@@ -16,6 +16,8 @@ reserved = {
     'theLovers':'AND',
     'theDevil':'OR',
     'theTower':'NOT',
+    'start':'START',
+    'end':'END'
 } 
 
 tokens = [
@@ -82,7 +84,7 @@ def t_ID(t):
     return t
 
 #Regra para ignorar espaços e quebras de linha
-t_ignore  = ' \n\t'
+t_ignore  = ' \t'
 
 #Regra para dar mensagem de herro caso haja caracteres que não têm token atribuido
 def t_error(t):
@@ -96,18 +98,3 @@ def t_newline(t):
 
 #Constrói o lexer
 lexer = lex.lex()
-
-#Código para teste
-data1 = '''
-x justice 2
-'''
-
-#Dar input para o lexer
-lexer.input(data1)
-
-#Tokenizar
-while True:
-    tok = lexer.token()
-    if not tok: #Se não tiver mais input
-        break  
-    print(tok)

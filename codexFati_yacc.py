@@ -3,9 +3,8 @@ from codexFati_lex import tokens, lexer
 
 teste = {}
 
-def p_odio(p):
-    '''odio : exp
-            | saida
+def p_init(p):
+    '''init : exp
             | codelines
             | program
     '''
@@ -19,6 +18,7 @@ def p_codeline(p):
             | if_instr
             | else_instr
             | while_instr
+            | for_instr
     '''
     print("isso é codeline")
     p[0] = f"\t{p[1]}"
@@ -40,9 +40,6 @@ def p_term(p):
             | CHAR
     '''
     p[0] = p[1]
-
-
-# Codigo kibado --------------------------
 
 Variaveis = []
 
@@ -152,38 +149,36 @@ def p_generic_expression(p):
     if(len(p)==2):
         p[0] = p[1]
     elif(len(p) == 3):
-        p[0] = not p[2]
+        p[0] = f"!{p[2]}"
     elif(len(p) == 4):
         if p[2] == '==':
-            p[0] = p[1] == p[3]
+            p[0] = f"{p[1]} == {p[3]}"
         elif p[2] == '>=':
-            p[0] = p[1] >= p[3]
+            p[0] = f"{p[1]} >= {p[3]}"
         elif p[2] == '<=':
-            p[0] = p[1] <= p[3]
+            p[0] = f"{p[1]} <= {p[3]}"
         elif p[2] == '>':
-            p[0] = p[1] > p[3]
+            p[0] = f"{p[1]} > {p[3]}"
         elif p[2] == '<':
-            p[0] = p[1] < p[3]
+            p[0] = f"{p[1]} < {p[3]}"
         elif p[2] == '!=':
-            p[0] = p[1] != p[3]
+            p[0] = f"{p[1]} != {p[3]}"
         elif p[2] == 'AND':
-            p[0] = p[1] and p[3]
+            p[0] = f"{p[1]} && {p[3]}"
         elif p[2] == 'OR':
-            p[0] = p[1] or p[3]
-        elif p[1] == '(':
-            p[0] = ( p[2] )
+            p[0] = f"{p[1]} || {p[3]}"
         elif p[2] == '+':
-            p[0] = p[1] + p[3]
+            p[0] = f"{p[1]} + {p[3]}"
         elif p[2] == '-':
-            p[0] = p[1] - p[3]
+            p[0] = f"{p[1]} - {p[3]}"
         elif p[2] == '*':
-            p[0] = p[1] * p[3]
+            p[0] = f"{p[1]} * {p[3]}"
         elif p[2] == '/':
-            p[0] = p[1] / p[3]
+            p[0] = f"{p[1]} / {p[3]}"
         elif p[2] == '%':
-            p[0] = p[1] % p[3]
+            p[0] = f"{p[1]} % {p[3]}"
         elif p[1] == '(':
-            p[0] = ( p[2] )
+            p[0] = f"({p[2]})"
 #------------------------------------------------------------
 
 def p_if(p):
@@ -207,16 +202,25 @@ def p_else(p):
 
 def p_while(p):
   'while_instr : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
-  
+
   p[0] = f'''
     while({p[3]}){{
         {p[6]}
     }}
   '''
 
+def p_for(p):
+    'for_instr : FOR OPEN_PARENTHESIS exp SEMICOLON exp SEMICOLON exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    print('aqui',p[3])
+    p[0] = f'''
+        for({p[3]}; {p[5]}; {p[7]}){{
+            {p[10]}
+        }}
+    '''
+
 def p_print(p):
     '''
-    saida : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
+        saida : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
     '''
     p[0] = f'std::cout << {p[3]};'
 
@@ -236,7 +240,10 @@ start
     theKnight y justice 5
     theKnight x justice 10
 
-    moon(x)
+    hermit(theKnight x justice 0; x < y; x += 1){
+        sun(x)
+    }
+
 end
 '''
 

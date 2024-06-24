@@ -6,7 +6,7 @@ variables = []
 # funções auxiliares 
 def varIndex(name):
     for i, v in enumerate(variables):
-        if v['name'] == name:
+        if v == name:
             return i
     return -1
 
@@ -67,10 +67,10 @@ def p_declaration(p):
 
     if(varIndex(p[2]) != -1):
         print(f"Variable with name:'{p[2]}' already exists")
-        # parar execução
+        raise SyntaxError
         return
 
-    variables.append({'name': p[2], 'type': p[1], 'value': p[4]})
+    variables.append(p[2])
 
     match(p[1]):
         case 'theKnight':
@@ -97,27 +97,22 @@ def p_attribution(p):
     
     index = varIndex(p[1])
     if(index == -1):
-        # parar execução
+        print(f"Variable with name:'{p[2]}' doesn't exist")
+        raise SyntaxError
         return
 
     match(p[2]):
         case '+=':
-            variables[index]["value"] += p[3]
             p[0] = f'{p[1]} += {p[3]};'
         case '-=':
-            variables[index]["value"] -= p[3]
             p[0] = f'{p[1]} -= {p[3]};'
         case '*=':
-            variables[index]["value"] *= p[3]
             p[0] = f'{p[1]} *= {p[3]};'
         case '/=':
-            variables[index]["value"] /= p[3]
             p[0] = f'{p[1]} /= {p[3]};'
         case '%=':
-            variables[index]["value"] %= p[3]
             p[0] = f'{p[1]} %= {p[3]};'
         case 'justice':
-            variables[index]["value"] = p[3]
             p[0] = f'{p[1]} = {p[3]};'
 
 
@@ -168,46 +163,30 @@ def p_expression(p):
 def p_if(p):
     'if_statement : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
 
-    p[0] = f'''
-        if({p[3]}) {{
-            {p[6]}
-        }}
-    '''
+    p[0] = f"if({p[3]}){{\n{p[6]}\n\t}}"
 
 
 def p_else(p):
     'else_statement : if_statement ELSE OPEN_BRACES codelines CLOSE_BRACES'
     
-    p[0] = f'''
-        {p[1]} 
-        else {{
-            {p[4]}
-        }}
-    '''
+    p[0] = f"{p[1]} else {{\n{p[4]}\n\t}}"
 
 
 def p_while(p):
     'while_statement : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
     
-    p[0] = f'''
-        while({p[3]}){{
-            {p[6]}
-        }}
-    '''
+    p[0] = f"while({p[3]}){{\n{p[6]}\n\t}}"
 
 def p_for(p):
     'for_statement : FOR OPEN_PARENTHESIS attribution SEMICOLON exp SEMICOLON attribution CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
     print(p[3])
     print(p[5])
     print(p[7])
-    p[0] = f'''
-        for({p[3].replace(";", "")}; {p[5].replace(";", "")}; {p[7].replace(";", "")}){{
-            {p[10]}
-        }}
-    '''
+    p[0] = f"for({p[3].replace(";", "")}; {p[5]}; {p[7].replace(";", "")}){{\n{p[10]}\n\t}}"
 
 def p_print(p):
-    'output : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS'
+    '''output : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
+            | OUTPUT OPEN_PARENTHESIS term CLOSE_PARENTHESIS'''
     
     p[0] = f'std::cout << {p[3]};'
 
@@ -218,20 +197,35 @@ def p_read(p):
     p[0] = f'std::cin << {p[3]};'
 
 
-# # Error rule for syntax errors
-# def p_error(p):
-#     print("Syntax error in input!")
-
-
-code = ''' 
+code = '''
 start
-    theKnight x justice 0
-
-    hermit(x justice 0; x < 10; x += 1){
-        sun(x)
+    theKnight op justice 1
+    temperance value justice 0.0
+    emperor(op != 0){
+        sun("digite um numero real:")
+        moon(value)
+        sun("qual opcao deseja:")
+        sun("0 - sair")
+        sun("1 - somar 5.50")
+        sun("2 - subtrair 3.50")
+        moon(op)
+        magician(op == 1) {
+            value justice value + 5.5
+            sun(value)
+        } wheelOfFortune {
+            magician(op == 2){
+                value justice value - 3.5
+                sun(value)
+            } wheelOfFortune {
+                sun("Opcao invalida")
+            }
+        }
     }
 end
 '''
+        # } wheelofFortune {
+        #     sun("Opcao invalida\n")
+        # }
 
 
 # Build the parser

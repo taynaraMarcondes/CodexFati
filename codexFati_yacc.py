@@ -1,14 +1,32 @@
 import ply.yacc as yacc
 from codexFati_lex import tokens, lexer
 
-teste = {}
+Variaveis = []
 
+# funções auxiliares 
+def indiceVar(name):
+    for i, v in enumerate(Variaveis):
+        if v['name'] == name:
+            return i
+    
+    print(f"Variable with name:'{name}' doesn't exist")
+    return -1
+
+# funções utilizadas pelo analisador
 def p_init(p):
-    '''init : exp
-            | codelines
+    '''init : codelines
             | program
     '''
     p[0] = p[1]
+
+
+def p_main(p):
+    '''program : START codelines END'''
+    print("isso é a main")
+    f = open("temp.cpp", "w")
+    f.write(f"#include <iostream>\n#include <string>\n\nint main(){{\n{p[2]}\n\treturn 0;\n}}")
+    f.close()
+
 
 def p_codeline(p):
     '''codeline : declaracao
@@ -22,6 +40,7 @@ def p_codeline(p):
     '''
     print("isso é codeline")
     p[0] = f"\t{p[1]}"
+
 
 def p_codelines(p):
     '''codelines : codeline
@@ -40,35 +59,6 @@ def p_term(p):
             | CHAR
     '''
     p[0] = p[1]
-
-Variaveis = []
-
-def indiceVar(name):
-    for i, v in enumerate(Variaveis):
-        if v['name'] == name:
-            return i
-    
-    print(f"Variable with name:'{name}' doesn't exist")
-    return -1
-
-# def value(var):
-#     id = existeVar(var)
-#     if(id == -1):
-#         print("Variable "+var+" doesn't exist")
-#     else:
-#         return var
-#         # if(Variaveis[id]['type'] == 'value'):
-#         #     return var
-#         # else:
-#         #     letras = modeloResitor2vetor(Variaveis[id]['value'])
-#         #     return conversao1(letras)
-
-def p_main(p):
-    '''program : START codelines END'''
-    print("isso é a main")
-    f = open("temp.cpp", "w")
-    f.write(f"#include <iostream>\n#include <string>\n\nint main(){{\n{p[2]}\n\treturn 0;\n}}")
-    f.close()
 
 
 def p_declaracao(p):
@@ -99,6 +89,7 @@ def p_declaracao(p):
         case 'theHighPriestess':
             if type(p[4]) == str:
                 p[0] = f'String {p[2]} = {p[4]};'
+
 
 def p_atribuicao(p):
     '''
@@ -134,9 +125,6 @@ def p_atribuicao(p):
             p[0] = f'{p[1]} = {p[3]};'
 
 
-# ----------------------------------------------------
-
-#Definindo expressões genéricas ----------------------
 def p_generic_expression(p):
     '''exp : term
                 | OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
@@ -179,7 +167,7 @@ def p_generic_expression(p):
             p[0] = f"{p[1]} % {p[3]}"
         elif p[1] == '(':
             p[0] = f"({p[2]})"
-#------------------------------------------------------------
+
 
 def p_if(p):
     'if_instr : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
@@ -190,6 +178,7 @@ def p_if(p):
         }}
     '''
 
+
 def p_else(p):
     'else_instr : if_instr ELSE OPEN_BRACES codeline CLOSE_BRACES'
     
@@ -199,6 +188,7 @@ def p_else(p):
             {p[4]}
         }}
     '''
+
 
 def p_while(p):
   'while_instr : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
@@ -224,11 +214,13 @@ def p_print(p):
     '''
     p[0] = f'std::cout << {p[3]};'
 
+
 def p_read(p):
     '''
     entrada : INPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
     '''
     p[0] = f'std::cin << {p[3]};'
+
 
 # # Error rule for syntax errors
 # def p_error(p):

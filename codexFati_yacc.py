@@ -163,44 +163,44 @@ def p_expression(p):
 def p_if(p):
     'if_statement : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
 
-    p[0] = f"if({p[3]}){{\n{p[6]}\n\t}}"
+    p[0] = f"if({p[3]}){{\n\t{p[6]}\n\t}}"
 
 
 def p_else(p):
     'else_statement : if_statement ELSE OPEN_BRACES codelines CLOSE_BRACES'
     
-    p[0] = f"{p[1]} else {{\n{p[4]}\n\t}}"
+    p[0] = f"{p[1]} else {{\n\t{p[4]}\n\t}}"
 
 
 def p_while(p):
     'while_statement : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
     
-    p[0] = f"while({p[3]}){{\n{p[6]}\n\t}}"
+    p[0] = f"while({p[3]}){{\n\t{p[6]}\n\t}}"
 
 def p_for(p):
     'for_statement : FOR OPEN_PARENTHESIS attribution SEMICOLON exp SEMICOLON attribution CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
-    p[0] = f"for({p[3].replace(";", "")}; {p[5]}; {p[7].replace(";", "")}){{\n{p[10]}\n\t}}"
+    p[0] = f"for({p[3].replace(";", "")}; {p[5]}; {p[7].replace(";", "")}){{\n\t{p[10]}\n\t}}"
 
 def p_print(p):
     '''output : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
             | OUTPUT OPEN_PARENTHESIS term CLOSE_PARENTHESIS'''
     
-    p[0] = f'std::cout << {p[3]};'
+    p[0] = f'std::cout << {p[3]} << std::endl;'
 
 
 def p_read(p):
     'input : INPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS'
     
-    p[0] = f'std::cin << {p[3]};'
+    p[0] = f'std::cin >> {p[3]};'
 
 
 code = '''
 start
     theKnight op justice 1
     temperance value justice 0.0
+    sun("digite um numero real:")
+    moon(value)
     emperor(op != 0){
-        sun("digite um numero real:")
-        moon(value)
         sun("qual opcao deseja:")
         sun("0 - sair")
         sun("1 - somar 5.50")

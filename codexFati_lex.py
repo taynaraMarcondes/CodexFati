@@ -1,10 +1,10 @@
 import ply.lex as lex
 
 reserved = {
-    'theKnight':'INT',
-    'temperance':'FLOAT',
-    'death':'CHAR',
-    'theHighPriestess':'STRING',
+    'theKnight':'T_INT',
+    'temperance':'T_FLOAT',
+    'death':'T_CHAR',
+    'theHighPriestess':'T_STRING',
     'moon':'INPUT',
     'sun':'OUTPUT',
     'magician':'IF',
@@ -19,6 +19,10 @@ reserved = {
 } 
 
 tokens = [
+    'INT',
+    'FLOAT',
+    'CHAR',
+    'STRING',
     'ATTRIBUTION',
     'ID',
     'ARITEXP',
@@ -46,6 +50,21 @@ t_RELOP = r'==|>=|<=|>|<|!='
 t_ATTRIBUTION = r'\+=|-=|\*=|/=|%='
 t_STRING = r"\"[^'\"]*\""
 t_CHAR = r"'[^'\"]'"
+t_T_INT = r'theKnight'
+t_T_FLOAT = r'temperance'
+t_T_CHAR = r'death'
+t_T_STRING = r'theHighPriestess'
+t_INPUT = r'moon'
+t_OUTPUT = r'sun'
+t_IF = r'magician'
+t_ELSE = r'wheelOfFortune'
+t_WHILE = r'emperor'
+t_FOR = r'hermit'
+t_EQUALS = r'justice'
+t_RETURN = r'theChariot'
+t_AND = r'theLovers'
+t_OR = r'theDevil'
+t_NOT = r'theTower'
 
 def t_FLOAT(t):
     r'[0-9]+(.[0-9]+)'
@@ -80,7 +99,7 @@ lexer = lex.lex()
 
 #Código para teste
 data1 = '''
-batata theLovers 2
+x justice 2
 '''
 
 #Dar input para o lexer

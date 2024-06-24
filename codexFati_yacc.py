@@ -1,8 +1,9 @@
 import ply.yacc as yacc
 from codexFati_lex import tokens, lexer
+from example import example
 
 variables = []
-
+cont = 0
 # funções auxiliares 
 def varIndex(name):
     for i, v in enumerate(variables):
@@ -20,7 +21,7 @@ def p_init(p):
 
 def p_main(p):
     '''program : START codelines END'''
-    f = open("temp.cpp", "w")
+    f = open(f"temp_{cont}.cpp", "w")
     f.write(f"#include <iostream>\n#include <string>\n\nint main(){{\n{p[2]}\n\treturn 0;\n}}")
     f.close()
 
@@ -179,7 +180,7 @@ def p_while(p):
 
 def p_for(p):
     'for_statement : FOR OPEN_PARENTHESIS attribution SEMICOLON exp SEMICOLON attribution CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
-    p[0] = f"for({p[3].replace(";", "")}; {p[5]}; {p[7].replace(";", "")}){{\n\t{p[10]}\n\t}}"
+    p[0] = f'for({p[3].replace(";", "")}; {p[5]}; {p[7].replace(";", "")}){{\n{p[10]}\n\t}}'
 
 def p_print(p):
     '''output : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
@@ -194,51 +195,24 @@ def p_read(p):
     p[0] = f'std::cin >> {p[3]};'
 
 
-code = '''
-start
-    theKnight op justice 1
-    temperance value justice 0.0
-    sun("digite um numero real:")
-    moon(value)
-    emperor(op != 0){
-        sun("qual opcao deseja:")
-        sun("0 - sair")
-        sun("1 - somar 5.50")
-        sun("2 - subtrair 3.50")
-        moon(op)
-        magician(op == 1) {
-            value justice value + 5.5
-            sun(value)
-        } wheelOfFortune {
-            magician(op == 2){
-                value justice value - 3.5
-                sun(value)
-            } wheelOfFortune {
-                sun("Opcao invalida")
-            }
-        }
-    }
-end
-'''
-        # } wheelofFortune {
-        #     sun("Opcao invalida\n")
-        # }
-
-
 # Build the parser
-parser = yacc.yacc()
 
-#Dar input para o lexer
-lexer.input(code)
+for el in example:
+    variables = []
+    cont = cont + 1
 
-#Tokenizar
-while True:
-    tok = lexer.token()
-    if not tok: #Se não tiver mais input
-        break  
-    print(tok)
+    parser = yacc.yacc()
+    #Dar input para o lexer
+    lexer.input(el)
 
-result = parser.parse(code)
-print(result)
+    #Tokenizar
+    while True:
+        tok = lexer.token()
+        if not tok: #Se não tiver mais input
+            break  
+        print(tok)
 
-print(f"variables: {variables}")
+    result = parser.parse(el)
+    print(result)
+
+    print(f"variables: {variables}")

@@ -18,6 +18,7 @@ def p_codeline(p):
             | entrada
             | if_instr
             | else_instr
+            | while_instr
     '''
     print("isso é codeline")
     p[0] = f"\t{p[1]}"
@@ -204,12 +205,14 @@ def p_else(p):
         }}
     '''
 
-# def p_while(p):
-#   'while_instr : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+def p_while(p):
+  'while_instr : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
   
-#   p[0] = 
-#   while(t[3]):
-#     t[0]=t[6]
+  p[0] = f'''
+    while({p[3]}){{
+        {p[6]}
+    }}
+  '''
 
 def p_print(p):
     '''
@@ -236,6 +239,7 @@ start
     moon(x)
 end
 '''
+
 
 # Build the parser
 parser = yacc.yacc()

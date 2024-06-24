@@ -15,6 +15,7 @@ def p_codeline(p):
     '''codeline : declaracao
             | atribuicao
             | saida
+            | entrada
             | if_instr
             | else_instr
     '''
@@ -189,7 +190,7 @@ def p_if(p):
     '''
 
 def p_else(p):
-    'else_instr : if_instrucao ELSE OPEN_BRACES codeline CLOSE_BRACES'
+    'else_instr : if_instr ELSE OPEN_BRACES codeline CLOSE_BRACES'
     
     p[0] = f'''
         {p[1]} 
@@ -211,6 +212,11 @@ def p_print(p):
     '''
     p[0] = f'std::cout << {p[3]};'
 
+def p_read(p):
+    '''
+    entrada : INPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
+    '''
+    p[0] = f'std::cin << {p[3]};'
 
 # # Error rule for syntax errors
 # def p_error(p):
@@ -220,7 +226,9 @@ def p_print(p):
 code = ''' 
 start
     theKnight y justice 5
-    sun(y)
+    theKnight x justice 10
+
+    moon(x)
 end
 '''
 

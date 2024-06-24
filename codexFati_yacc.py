@@ -166,7 +166,7 @@ def p_expression(p):
 
 
 def p_if(p):
-    'if_statement : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    'if_statement : IF OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
 
     p[0] = f'''
         if({p[3]}) {{
@@ -176,7 +176,7 @@ def p_if(p):
 
 
 def p_else(p):
-    'else_statement : if_statement ELSE OPEN_BRACES codeline CLOSE_BRACES'
+    'else_statement : if_statement ELSE OPEN_BRACES codelines CLOSE_BRACES'
     
     p[0] = f'''
         {p[1]} 
@@ -187,7 +187,7 @@ def p_else(p):
 
 
 def p_while(p):
-    'while_statement : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
+    'while_statement : WHILE OPEN_PARENTHESIS exp CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
     
     p[0] = f'''
         while({p[3]}){{
@@ -196,11 +196,12 @@ def p_while(p):
     '''
 
 def p_for(p):
-    'for_statement : FOR OPEN_PARENTHESIS exp SEMICOLON exp SEMICOLON exp CLOSE_PARENTHESIS OPEN_BRACES codeline CLOSE_BRACES'
-    
-    print('aqui',p[3])
+    'for_statement : FOR OPEN_PARENTHESIS attribution SEMICOLON exp SEMICOLON attribution CLOSE_PARENTHESIS OPEN_BRACES codelines CLOSE_BRACES'
+    print(p[3])
+    print(p[5])
+    print(p[7])
     p[0] = f'''
-        for({p[3]}; {p[5]}; {p[7]}){{
+        for({p[3].replace(";", "")}; {p[5].replace(";", "")}; {p[7].replace(";", "")}){{
             {p[10]}
         }}
     '''
@@ -224,13 +225,11 @@ def p_read(p):
 
 code = ''' 
 start
-    theKnight y justice 5
-    theKnight x justice 10
+    theKnight x justice 0
 
-    emperor(x > y){
-        y += 1
+    hermit(x justice 0; x < 10; x += 1){
+        sun(x)
     }
-
 end
 '''
 

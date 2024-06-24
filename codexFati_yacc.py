@@ -81,6 +81,11 @@ def p_declaracao(p):
          | T_STRING ID EQUALS STRING
      '''
 
+    if(indiceVar(p[2]) != -1):
+        print(f"Variable with name:'{p[2]}' already exists")
+        # parar execução
+        return
+
     Variaveis.append({'name': p[2], 'type': p[1], 'value': p[4]})
 
     match(p[1]):

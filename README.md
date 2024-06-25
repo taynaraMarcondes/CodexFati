@@ -98,6 +98,8 @@ Por fim, o arquivo executável pode ser aberto para visualizar o resultado do c�
 - No Windows: `./a.exe`
 - No Linux: `./a.out`
 
+Além disso, serão gerados arquivos _lexer\_x.txt_ que contém a análise léxica de cada exemplo, onde x é o número do exemplo de acordo com sua posição na lista de exemplos.
+
 ## Desenvolvimento
 
 Esse projeto foi desenvolvido por:

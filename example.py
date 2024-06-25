@@ -64,6 +64,7 @@ example = [
         sun("1 - obter x > y")
         sun("2 - obter !(x <= y)")
         sun("3 - obter x > y and 90 > x")
+        sun("4 - obter x > y or 90 > x")
         moon(op)
         magician(op == 1) {
             sun((x > y))
@@ -73,6 +74,9 @@ example = [
         }
         magician(op == 3) {
             sun(((x > y) theLovers (90 > x)))
+        }
+        magician(op == 4) {
+            sun(((x > y) theDevil (90 > x)))
         }
     }
   end

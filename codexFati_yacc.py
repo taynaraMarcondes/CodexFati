@@ -211,13 +211,16 @@ for el in example:
     #Dar input para o lexer
     lexer.input(el)
 
+    f = open(f"lexer_{cont}.txt", "w")
+
     #Tokenizar
     while True:
         tok = lexer.token()
         if not tok: #Se não tiver mais input
             break  
-        print(tok)
+        f.write(str(tok) + '\n')
 
+    f.close()
     result = parser.parse(el)
 
     print(f"variables: {variables}")

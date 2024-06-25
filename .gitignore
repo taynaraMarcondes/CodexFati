@@ -3,3 +3,4 @@ parsetab.py
 __pycache__
 *.cpp
 *.exe
+*.txt

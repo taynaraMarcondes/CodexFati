@@ -4,6 +4,7 @@ reserved = {
     'theKnight':'T_INT',
     'temperance':'T_FLOAT',
     'death':'T_CHAR',
+    'judgment':'T_BOOL',
     'theHighPriestess':'T_STRING',
     'moon':'INPUT',
     'sun':'OUTPUT',
@@ -25,6 +26,7 @@ tokens = [
     'FLOAT',
     'CHAR',
     'STRING',
+    'BOOL',
     'ATTRIBUTION',
     'ID',
     'ARITEXP',
@@ -52,6 +54,7 @@ t_RELOP = r'==|>=|<=|>|<|!='
 t_ATTRIBUTION = r'\+=|-=|\*=|/=|%='
 t_STRING = r"\"[^'\"]*\""
 t_CHAR = r"'[^'\"]'"
+t_BOOL = r"true|false"
 t_T_INT = r'theKnight'
 t_T_FLOAT = r'temperance'
 t_T_CHAR = r'death'

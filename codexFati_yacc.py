@@ -54,8 +54,9 @@ def p_term(p):
             | ID
             | STRING
             | CHAR
+            | BOOL
     '''
-    p[0] = p[1]
+    p[0] = f"{p[1]}"
 
 
 def p_declaration(p):
@@ -64,6 +65,7 @@ def p_declaration(p):
                 | T_FLOAT ID EQUALS FLOAT
                 | T_CHAR ID EQUALS CHAR
                 | T_STRING ID EQUALS STRING
+                | T_BOOL ID EQUALS BOOL
      '''
 
     if(varIndex(p[2]) != -1):
@@ -86,6 +88,9 @@ def p_declaration(p):
         case 'theHighPriestess':
             if type(p[4]) == str:
                 p[0] = f'String {p[2]} = {p[4]};'
+        case 'judgment':
+            if type(p[4]) == bool:
+                p[0] = f'bool {p[2]} = {p[4]};'
 
 
 def p_attribution(p):
@@ -127,7 +132,7 @@ def p_expression(p):
             | NOT exp
     ''' 
     if(len(p)==2):
-        p[0] = p[1]
+        p[0] = f'{p[1]}'
     elif(len(p) == 3):
         p[0] = f"!{p[2]}"
     elif(len(p) == 4):
@@ -143,9 +148,9 @@ def p_expression(p):
             p[0] = f"{p[1]} < {p[3]}"
         elif p[2] == '!=':
             p[0] = f"{p[1]} != {p[3]}"
-        elif p[2] == 'AND':
+        elif p[2] == 'theLovers':
             p[0] = f"{p[1]} && {p[3]}"
-        elif p[2] == 'OR':
+        elif p[2] == 'theDevil':
             p[0] = f"{p[1]} || {p[3]}"
         elif p[2] == '+':
             p[0] = f"{p[1]} + {p[3]}"
@@ -184,7 +189,8 @@ def p_for(p):
 
 def p_print(p):
     '''output : OUTPUT OPEN_PARENTHESIS ID CLOSE_PARENTHESIS
-            | OUTPUT OPEN_PARENTHESIS term CLOSE_PARENTHESIS'''
+            | OUTPUT OPEN_PARENTHESIS exp CLOSE_PARENTHESIS
+    '''
     
     p[0] = f'std::cout << {p[3]} << std::endl;'
 
@@ -213,6 +219,5 @@ for el in example:
         print(tok)
 
     result = parser.parse(el)
-    print(result)
 
     print(f"variables: {variables}")

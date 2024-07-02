@@ -89,7 +89,7 @@ def t_ID(t):
 #Regra para ignorar espaços e quebras de linha
 t_ignore  = ' \t'
 
-#Regra para dar mensagem de herro caso haja caracteres que não têm token atribuido
+#Regra para dar mensagem de erro caso haja caracteres que não têm token atribuido
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
